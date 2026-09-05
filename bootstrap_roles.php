@@ -53,11 +53,25 @@ try {
     /* Backfill legacy admins into the new administrative role model. */
     $p->exec("UPDATE users SET admin_role='admin' WHERE is_admin=1 AND admin_role='none'");
 
-    /* The bootstrap address is kept in Railway, not committed as a privileged secret. */
+    /*
+       Primary production mechanism: SUPER_ADMIN_EMAIL may be provided by the host.
+       Fallback bootstrap uses only a SHA-256 fingerprint so the privileged address
+       itself is not committed to the public repository.
+    */
     $superEmail = strtolower(trim((string)getenv('SUPER_ADMIN_EMAIL')));
     if ($superEmail !== '') {
         $q = $p->prepare("UPDATE users SET is_admin=1, admin_role='super_admin' WHERE LOWER(email)=?");
         $q->execute([$superEmail]);
+    } else {
+        $bootstrapHash = '4e16c69827f4efc003cd1313362638391d966ca1b746f05ed6437e5c3fa8e2c5';
+        $rows = $p->query("SELECT id,email FROM users WHERE admin_role<>'super_admin'")->fetchAll();
+        foreach ($rows as $row) {
+            if (hash_equals($bootstrapHash, hash('sha256', strtolower(trim($row['email']))))) {
+                $q = $p->prepare("UPDATE users SET is_admin=1, admin_role='super_admin' WHERE id=?");
+                $q->execute([$row['id']]);
+                break;
+            }
+        }
     }
 
     /* Keep the legacy access flag synchronized for the current monolithic dashboard. */
