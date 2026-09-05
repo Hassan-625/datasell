@@ -1,6 +1,4 @@
 (() => {
-  // Load the dashboard compatibility layer after the main stylesheet so
-  // newer PHP shell class names receive the correct desktop/mobile layout.
   if (!document.querySelector('link[data-ihlink-layout-fix]')) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
@@ -11,8 +9,6 @@
 
   const qs=(s,c=document)=>c.querySelector(s), qsa=(s,c=document)=>[...c.querySelectorAll(s)];
 
-  // Add commercial upgrade access for all signed-in users and the advanced
-  // tier administration link only when the server-rendered Admin Console link exists.
   const sidebarNav = qs('.sidebar-nav');
   if (sidebarNav && !qs('a[href="/upgrade.php"]', sidebarNav)) {
     const upgrade = document.createElement('a');
@@ -28,6 +24,16 @@
     control.className = 'nav-item';
     control.innerHTML = '<span>Tier Management</span>';
     sidebarNav.appendChild(control);
+  }
+
+  // The old profile form allowed direct self-promotion. Replace it with the
+  // administrator-reviewed upgrade flow while leaving the rest of the profile intact.
+  const legacyRoleAction = qs('input[name="action"][value="change_role"]');
+  const legacyRoleForm = legacyRoleAction?.closest('form');
+  if (legacyRoleForm) {
+    const box = document.createElement('div');
+    box.innerHTML = '<div class="notice"><span>↗</span><div><b>Tier changes require approval</b><br><small>Request Premium, Reseller or API access from the upgrade page.</small><br><br><a class="btn btn-primary" href="/upgrade.php">Request an upgrade →</a></div></div>';
+    legacyRoleForm.replaceWith(box);
   }
 
   const sidebar=qs('#sidebar'), overlay=qs('[data-sidebar-overlay]');
