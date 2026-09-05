@@ -10,6 +10,26 @@
   }
 
   const qs=(s,c=document)=>c.querySelector(s), qsa=(s,c=document)=>[...c.querySelectorAll(s)];
+
+  // Add commercial upgrade access for all signed-in users and the advanced
+  // tier administration link only when the server-rendered Admin Console link exists.
+  const sidebarNav = qs('.sidebar-nav');
+  if (sidebarNav && !qs('a[href="/upgrade.php"]', sidebarNav)) {
+    const upgrade = document.createElement('a');
+    upgrade.href = '/upgrade.php';
+    upgrade.className = 'nav-item';
+    upgrade.innerHTML = '<span>Upgrade Account</span>';
+    sidebarNav.appendChild(upgrade);
+  }
+  const hasAdmin = !!qs('a[href="?page=admin"]', sidebarNav || document);
+  if (sidebarNav && hasAdmin && !qs('a[href="/admin-control.php"]', sidebarNav)) {
+    const control = document.createElement('a');
+    control.href = '/admin-control.php';
+    control.className = 'nav-item';
+    control.innerHTML = '<span>Tier Management</span>';
+    sidebarNav.appendChild(control);
+  }
+
   const sidebar=qs('#sidebar'), overlay=qs('[data-sidebar-overlay]');
   qs('[data-sidebar-open]')?.addEventListener('click',()=>{sidebar?.classList.add('open');overlay?.classList.add('show')});
   const closeSidebar=()=>{sidebar?.classList.remove('open');overlay?.classList.remove('show')};
