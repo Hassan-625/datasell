@@ -1,4 +1,14 @@
 (() => {
+  // Load the dashboard compatibility layer after the main stylesheet so
+  // newer PHP shell class names receive the correct desktop/mobile layout.
+  if (!document.querySelector('link[data-ihlink-layout-fix]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/assets/css/layout-fix.css?v=1';
+    link.dataset.ihlinkLayoutFix = '1';
+    document.head.appendChild(link);
+  }
+
   const qs=(s,c=document)=>c.querySelector(s), qsa=(s,c=document)=>[...c.querySelectorAll(s)];
   const sidebar=qs('#sidebar'), overlay=qs('[data-sidebar-overlay]');
   qs('[data-sidebar-open]')?.addEventListener('click',()=>{sidebar?.classList.add('open');overlay?.classList.add('show')});
