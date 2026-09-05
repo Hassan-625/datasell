@@ -1,0 +1,38 @@
+/* IHLink Datasub — customer-facing VTU workspace */
+body.ih-customer-ui .dashboard-main{background:#f7f9fc}
+body.ih-customer-ui .dash-header .eyebrow{display:none}
+body.ih-customer-ui .dash-header h1{font-size:24px}
+body.ih-customer-ui .sidebar-pro{background:#101827}
+body.ih-customer-ui .sidebar-pro .nav-item{font-size:13px}
+body.ih-customer-ui .sidebar-pro .nav-item[data-common='0']{display:none!important}
+body.ih-customer-ui .workspace-grid{grid-template-columns:1fr!important}
+body.ih-customer-ui .workspace-grid>.account-summary{display:none!important}
+body.ih-customer-ui .wallet-overview{min-height:190px;border-radius:22px;padding:24px;background:linear-gradient(135deg,#0a62bd,#0f86e8);box-shadow:0 16px 38px rgba(15,111,202,.18)}
+body.ih-customer-ui .wallet-overview>div:first-child span{font-size:13px;opacity:.9}
+body.ih-customer-ui .wallet-overview strong{font-size:36px;margin:6px 0;display:block}
+body.ih-customer-ui .wallet-overview small{font-size:12px;opacity:.9}
+body.ih-customer-ui .primary-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
+body.ih-customer-ui .primary-actions a{border-radius:12px;padding:13px 10px;background:rgba(255,255,255,.97);font-size:13px}
+body.ih-customer-ui .section-block{margin-top:24px}
+body.ih-customer-ui .section-title h2{font-size:18px}
+body.ih-customer-ui .section-title p{font-size:13px}
+body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+body.ih-customer-ui .service-link{min-height:136px;padding:18px 16px;border-radius:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 5px 20px rgba(15,23,42,.04)}
+body.ih-customer-ui .service-link::before{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#eef6ff;color:#0b6bcb;font-size:20px;font-weight:800;margin-bottom:4px}
+body.ih-customer-ui .service-link[href*='page=data']::before{content:'⇅'}
+body.ih-customer-ui .service-link[href*='page=airtime']::before{content:'☎'}
+body.ih-customer-ui .service-link[href*='page=electricity']::before{content:'⚡'}
+body.ih-customer-ui .service-link[href*='page=cable']::before{content:'▣'}
+body.ih-customer-ui .service-link[href*='page=exam']::before{content:'✓'}
+body.ih-customer-ui .service-link[href*='page=transactions']::before{content:'↺'}
+body.ih-customer-ui .service-link h3{font-size:14px;margin:2px 0}
+body.ih-customer-ui .service-link p{font-size:11px;line-height:1.45;margin:0;color:#728095}
+body.ih-customer-ui .service-link .card-link{display:none}
+body.ih-customer-ui .customer-hidden{display:none!important}
+body.ih-customer-ui .pricing-badge{background:#f1f5f9;color:#64748b}
+body.ih-customer-ui .customer-profile-upgrade{margin-top:14px;padding:16px;border:1px solid #e5eaf0;border-radius:14px;background:#fbfcfe}
+body.ih-customer-ui .customer-profile-upgrade h4{margin:0 0 5px;font-size:14px}
+body.ih-customer-ui .customer-profile-upgrade p{margin:0 0 12px;font-size:12px;color:#6d7b8e}
+@media(max-width:1050px){body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}body.ih-customer-ui .service-link{min-height:110px;padding:13px 8px}body.ih-customer-ui .service-link p{display:none}body.ih-customer-ui .wallet-overview{padding:20px;min-height:178px}body.ih-customer-ui .wallet-overview strong{font-size:31px}.primary-actions{gap:8px!important}}
+@media(max-width:430px){body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(3,1fr)}body.ih-customer-ui .service-link h3{font-size:12px}body.ih-customer-ui .service-link::before{width:38px;height:38px;font-size:18px}body.ih-customer-ui .primary-actions a{font-size:11px;padding:11px 6px}}
