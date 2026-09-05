@@ -26,6 +26,23 @@
     sidebarNav.appendChild(control);
   }
 
+  // Google OAuth entry point on both login and registration forms.
+  const authAction = qs('form input[name="action"][value="login"], form input[name="action"][value="register"]');
+  const authForm = authAction?.closest('form');
+  if (authForm && !qs('[data-google-auth]')) {
+    const googleWrap=document.createElement('div');
+    googleWrap.dataset.googleAuth='1';
+    googleWrap.style.marginTop='16px';
+    googleWrap.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:#7a8797;font-size:12px">
+        <span style="height:1px;background:#e2e8f0;flex:1"></span><span>OR</span><span style="height:1px;background:#e2e8f0;flex:1"></span>
+      </div>
+      <a href="/google-auth.php?action=start" class="btn btn-ghost" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #d9e1ea;background:#fff">
+        <span style="font-weight:900;font-size:18px">G</span><span>Continue with Google</span>
+      </a>`;
+    authForm.appendChild(googleWrap);
+  }
+
   // The old profile form allowed direct self-promotion. Replace it with the
   // administrator-reviewed upgrade flow while leaving the rest of the profile intact.
   const legacyRoleAction = qs('input[name="action"][value="change_role"]');
