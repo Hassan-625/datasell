@@ -1,8 +1,6 @@
 <?php
-/* Runs before every PHP entrypoint. No output. */
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+/* Runs before every PHP entrypoint. No output and no session creation here.
+   Each page that needs a session starts it itself. */
 
 /* Legacy Account & Role used to let users self-promote to reseller/API.
    Commercial tier changes now go through the reviewed upgrade workflow. */
