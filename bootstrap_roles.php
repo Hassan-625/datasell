@@ -4,6 +4,13 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+/* Legacy Account & Role used to let users self-promote to reseller/API.
+   Commercial tier changes now go through the reviewed upgrade workflow. */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_POST['action'] ?? '') === 'change_role')) {
+    header('Location: /upgrade.php');
+    exit;
+}
+
 function ih_bootstrap_db(): ?PDO {
     static $pdo = null;
     if ($pdo instanceof PDO) return $pdo;
@@ -24,7 +31,6 @@ try {
     $p = ih_bootstrap_db();
     if (!$p) return;
 
-    /* Existing deployments may have an older users schema, so migrate incrementally. */
     $cols = $p->query('SHOW COLUMNS FROM users')->fetchAll(PDO::FETCH_COLUMN);
     if (!in_array('admin_role', $cols, true)) {
         $p->exec("ALTER TABLE users ADD admin_role VARCHAR(20) NOT NULL DEFAULT 'none' AFTER is_admin");
@@ -50,14 +56,9 @@ try {
         INDEX(user_id), INDEX(status), INDEX(requested_tier)
     ) ENGINE=InnoDB");
 
-    /* Backfill legacy admins into the new administrative role model. */
     $p->exec("UPDATE users SET admin_role='admin' WHERE is_admin=1 AND admin_role='none'");
 
-    /*
-       Primary production mechanism: SUPER_ADMIN_EMAIL may be provided by the host.
-       Fallback bootstrap uses only a SHA-256 fingerprint so the privileged address
-       itself is not committed to the public repository.
-    */
+    /* Prefer a host-supplied address. The fallback stores only a one-way fingerprint. */
     $superEmail = strtolower(trim((string)getenv('SUPER_ADMIN_EMAIL')));
     if ($superEmail !== '') {
         $q = $p->prepare("UPDATE users SET is_admin=1, admin_role='super_admin' WHERE LOWER(email)=?");
@@ -74,7 +75,6 @@ try {
         }
     }
 
-    /* Keep the legacy access flag synchronized for the current monolithic dashboard. */
     $p->exec("UPDATE users SET is_admin=1 WHERE admin_role IN ('admin','super_admin') AND is_admin<>1");
     $p->exec("UPDATE users SET is_admin=0 WHERE admin_role='none' AND is_admin<>0");
 } catch (Throwable $e) {
