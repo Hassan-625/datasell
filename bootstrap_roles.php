@@ -1,5 +1,5 @@
 <?php
-/* Global IHLink bootstrap: schema, super-admin bootstrap and server-side RBAC. No output. */
+/* Global IHLink bootstrap: schema, platform upgrades, super-admin bootstrap and server-side RBAC. No output. */
 function ih_bootstrap_db(): ?PDO {static $pdo=null;if($pdo instanceof PDO)return $pdo;try{$pdo=new PDO('mysql:host='.(getenv('DB_HOST')?:'127.0.0.1').';port='.(getenv('DB_PORT')?:'3306').';dbname='.(getenv('DB_NAME')?:'datasell').';charset=utf8mb4',getenv('DB_USER')?:'root',getenv('DB_PASS')?:'',[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);return $pdo;}catch(Throwable $e){return null;}}
 try{
  $p=ih_bootstrap_db();if(!$p)return;
@@ -8,33 +8,12 @@ try{
  foreach($adds as $c=>$sql)if(!in_array($c,$cols,true))$p->exec($sql);
  $p->exec("CREATE TABLE IF NOT EXISTS upgrade_requests(id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,user_id INT UNSIGNED NOT NULL,requested_tier VARCHAR(20) NOT NULL,business_name VARCHAR(160) NULL,reason VARCHAR(500) NULL,status VARCHAR(20) NOT NULL DEFAULT 'pending',reviewed_by INT UNSIGNED NULL,review_note VARCHAR(500) NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,reviewed_at DATETIME NULL,INDEX(user_id),INDEX(status),INDEX(requested_tier)) ENGINE=InnoDB");
  $p->exec("CREATE TABLE IF NOT EXISTS admin_audit_logs(id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,admin_user_id INT UNSIGNED NOT NULL,action VARCHAR(100) NOT NULL,target_user_id INT UNSIGNED NULL,details TEXT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,INDEX(admin_user_id),INDEX(target_user_id),INDEX(created_at)) ENGINE=InnoDB");
+ if(is_file(__DIR__.'/platform-upgrade.php')){require_once __DIR__.'/platform-upgrade.php';ih_platform_upgrade($p);}
  $p->exec("UPDATE users SET admin_role='admin' WHERE is_admin=1 AND admin_role='none'");
  $superEmail=strtolower(trim((string)getenv('SUPER_ADMIN_EMAIL')));if($superEmail!==''){$q=$p->prepare("UPDATE users SET is_admin=1,admin_role='super_admin',admin_enabled=1 WHERE LOWER(email)=?");$q->execute([$superEmail]);}else{$hash='4e16c69827f4efc003cd1313362638391d966ca1b746f05ed6437e5c3fa8e2c5';foreach($p->query("SELECT id,email FROM users WHERE admin_role<>'super_admin'")->fetchAll() as $r){if(hash_equals($hash,hash('sha256',strtolower(trim($r['email']))))){$p->prepare("UPDATE users SET is_admin=1,admin_role='super_admin',admin_enabled=1 WHERE id=?")->execute([$r['id']]);break;}}}
- $p->exec("UPDATE users SET is_admin=1 WHERE admin_role IN ('admin','super_admin') AND admin_enabled=1 AND is_admin<>1");
- $p->exec("UPDATE users SET is_admin=0 WHERE (admin_role='none' OR admin_enabled=0) AND admin_role<>'super_admin' AND is_admin<>0");
+ $p->exec("UPDATE users SET is_admin=1 WHERE admin_role IN ('admin','super_admin') AND admin_enabled=1 AND is_admin<>1");$p->exec("UPDATE users SET is_admin=0 WHERE (admin_role='none' OR admin_enabled=0) AND admin_role<>'super_admin' AND is_admin<>0");
 }catch(Throwable $e){}
-
-/* Block legacy customer self-promotion. */
 if(($_SERVER['REQUEST_METHOD']??'GET')==='POST' && (($_POST['action']??'')==='change_role')){header('Location:/upgrade.php');exit;}
-
-/* RBAC is enforced before protected PHP entrypoints execute. UI hiding is not relied upon. */
-$ihPath=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH)?:'/';
-$ihPage=$_GET['page']??'';
-$protected=($ihPath==='/admin-control.php'||$ihPath==='/staff-admin.php'||$ihPage==='admin');
-if($protected){
- if(session_status()!==PHP_SESSION_ACTIVE)session_start();
- if(empty($_SESSION['uid'])){header('Location:/?page=login');exit;}
- $q=$p->prepare('SELECT id,admin_role,staff_role,admin_permissions,admin_enabled FROM users WHERE id=?');$q->execute([$_SESSION['uid']]);$a=$q->fetch();
- if(!$a||!in_array($a['admin_role'],['admin','super_admin'],true)||($a['admin_role']!=='super_admin'&&!(int)$a['admin_enabled'])){http_response_code(403);exit('403 Forbidden — administrative access is not enabled for this account.');}
- if($ihPath==='/staff-admin.php'&&$a['admin_role']!=='super_admin'){http_response_code(403);exit('403 Forbidden — Super Admin access required.');}
- $perms=$a['admin_role']==='super_admin'?['*']:(json_decode($a['admin_permissions']?:'[]',true)?:[]);
- $has=function($perm)use($perms){return in_array('*',$perms,true)||in_array($perm,$perms,true);};
- if($ihPath==='/admin-control.php'&&$a['admin_role']!=='super_admin'&&!$has('upgrades')&&!$has('users')&&!$has('resellers')&&!$has('api_users')){http_response_code(403);exit('403 Forbidden — your staff role does not include account/tier administration.');}
- if($ihPage==='admin'&&$a['admin_role']!=='super_admin'){
-   $action=$_POST['action']??'';
-   $map=['approve_funding'=>'funding','reject_funding'=>'funding','add_plan'=>'products','save_plan'=>'products','update_plan'=>'products','delete_plan'=>'products','toggle_plan'=>'products','set_tier'=>'upgrades','review_upgrade'=>'upgrades','set_admin_role'=>'users'];
-   if(isset($map[$action])&&!$has($map[$action])){http_response_code(403);exit('403 Forbidden — your administrator role does not permit this operation.');}
-   /* GET access to the shared console requires at least one operational permission. */
-   if(!$perms){http_response_code(403);exit('403 Forbidden — no administrative permissions are assigned to this account.');}
- }
+$ihPath=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH)?:'/';$ihPage=$_GET['page']??'';$protected=($ihPath==='/admin-control.php'||$ihPath==='/staff-admin.php'||$ihPath==='/admin-products.php'||$ihPage==='admin');
+if($protected){if(session_status()!==PHP_SESSION_ACTIVE)session_start();if(empty($_SESSION['uid'])){header('Location:/?page=login');exit;}$q=$p->prepare('SELECT id,admin_role,staff_role,admin_permissions,admin_enabled FROM users WHERE id=?');$q->execute([$_SESSION['uid']]);$a=$q->fetch();if(!$a||!in_array($a['admin_role'],['admin','super_admin'],true)||($a['admin_role']!=='super_admin'&&!(int)$a['admin_enabled'])){http_response_code(403);exit('403 Forbidden — administrative access is not enabled for this account.');}if($ihPath==='/staff-admin.php'&&$a['admin_role']!=='super_admin'){http_response_code(403);exit('403 Forbidden — Super Admin access required.');}$perms=$a['admin_role']==='super_admin'?['*']:(json_decode($a['admin_permissions']?:'[]',true)?:[]);$has=function($perm)use($perms){return in_array('*',$perms,true)||in_array($perm,$perms,true);};if($ihPath==='/admin-products.php'&&$a['admin_role']!=='super_admin'&&!$has('products')){http_response_code(403);exit('403 Forbidden — product permission required.');}if($ihPath==='/admin-control.php'&&$a['admin_role']!=='super_admin'&&!$has('upgrades')&&!$has('users')&&!$has('resellers')&&!$has('api_users')){http_response_code(403);exit('403 Forbidden — your staff role does not include account/tier administration.');}if($ihPage==='admin'&&$a['admin_role']!=='super_admin'){$action=$_POST['action']??'';$map=['approve'=>'funding','approve_funding'=>'funding','reject_funding'=>'funding','add_plan'=>'products','save_plan'=>'products','update_plan'=>'products','delete_plan'=>'products','toggle_plan'=>'products','admin_role'=>'users','set_admin_role'=>'users','set_tier'=>'upgrades','review_upgrade'=>'upgrades'];if(isset($map[$action])&&!$has($map[$action])){http_response_code(403);exit('403 Forbidden — your administrator role does not permit this operation.');}if(!$perms){http_response_code(403);exit('403 Forbidden — no administrative permissions are assigned to this account.');}}
 }
