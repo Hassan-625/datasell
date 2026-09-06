@@ -1,53 +1,22 @@
-/* IHLink Datasub — standard customer-facing VTU workspace */
-body.ih-customer-ui .dashboard-main{background:#f6f8fb}
-body.ih-customer-ui .dash-header{padding-bottom:8px}
-body.ih-customer-ui .dash-header .eyebrow{display:none}
-body.ih-customer-ui .dash-header h1{font-size:25px;margin-bottom:2px}
-body.ih-customer-ui .user-chip small{color:#6d7b8e}
-body.ih-customer-ui .sidebar-pro{background:#0d1726}
-body.ih-customer-ui .sidebar-pro .nav-item{font-size:13px}
-body.ih-customer-ui .sidebar-pro .nav-item[data-common='0']{display:none!important}
-body.ih-customer-ui .workspace-grid{grid-template-columns:1fr!important;gap:16px!important}
-body.ih-customer-ui .workspace-grid>.account-summary{display:none!important}
-body.ih-customer-ui .wallet-overview{min-height:188px;border-radius:22px;padding:24px;background:linear-gradient(135deg,#0a5fb7 0%,#0f86e8 100%);box-shadow:0 16px 38px rgba(15,111,202,.18)}
-body.ih-customer-ui .wallet-overview>div:first-child span{font-size:13px;opacity:.92}
-body.ih-customer-ui .wallet-overview strong{font-size:36px;margin:6px 0;display:block}
-body.ih-customer-ui .wallet-overview small{font-size:12px;opacity:.9}
-body.ih-customer-ui .primary-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px;max-width:520px}
-body.ih-customer-ui .primary-actions a{border-radius:12px;padding:13px 10px;background:rgba(255,255,255,.98);font-size:13px;color:#0d1726;font-weight:800}
-body.ih-customer-ui .section-block{margin-top:24px}
-body.ih-customer-ui .section-title h2{font-size:18px}
-body.ih-customer-ui .section-title p{font-size:13px}
-body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-body.ih-customer-ui .service-link{min-height:136px;padding:18px 16px;border-radius:16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 5px 20px rgba(15,23,42,.04);transition:transform .18s ease,box-shadow .18s ease}
-body.ih-customer-ui .service-link:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(15,23,42,.08)}
-body.ih-customer-ui .service-link::before{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#eef6ff;color:#0b6bcb;font-size:20px;font-weight:800;margin-bottom:4px}
-body.ih-customer-ui .service-link[href*='page=data']::before{content:'⇅'}
-body.ih-customer-ui .service-link[href*='page=airtime']::before{content:'☎'}
-body.ih-customer-ui .service-link[href*='page=electricity']::before{content:'⚡'}
-body.ih-customer-ui .service-link[href*='page=cable']::before{content:'▣'}
-body.ih-customer-ui .service-link[href*='page=exam']::before{content:'✓'}
-body.ih-customer-ui .service-link[href*='page=transactions']::before{content:'↺'}
-body.ih-customer-ui .service-link h3{font-size:14px;margin:2px 0}
-body.ih-customer-ui .service-link p{font-size:11px;line-height:1.45;margin:0;color:#728095}
-body.ih-customer-ui .service-link .card-link{display:none}
-body.ih-customer-ui .table-card{border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(15,23,42,.03)}
-body.ih-customer-ui .customer-hidden{display:none!important}
-body.ih-customer-ui .pricing-badge{background:#f1f5f9;color:#64748b}
-body.ih-customer-ui .customer-profile-upgrade{margin-top:14px;padding:16px;border:1px solid #e5eaf0;border-radius:14px;background:#fbfcfe}
-body.ih-customer-ui .customer-profile-upgrade h4{margin:0 0 5px;font-size:14px}
-body.ih-customer-ui .customer-profile-upgrade p{margin:0 0 12px;font-size:12px;color:#6d7b8e}
-body.ih-customer-ui .customer-help-strip{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;background:#fff;border:1px solid #e7ebf0;border-radius:16px;padding:18px 20px;margin-top:20px}
-body.ih-customer-ui .customer-help-strip h3{font-size:15px;margin:0 0 4px}
-body.ih-customer-ui .customer-help-strip p{font-size:12px;color:#6d7b8e;margin:0}
-body.ih-customer-ui .customer-help-strip .help-actions{display:flex;gap:8px;flex-wrap:wrap}
-/* Consumer accounts must not expose business/internal administration navigation. */
-body.ih-customer-ui a[href='?page=api-dashboard'],
-body.ih-customer-ui a[href='?page=reseller'],
-body.ih-customer-ui a[href='?page=admin'],
-body.ih-customer-ui a[href='/admin-control.php'],
-body.ih-customer-ui a[href='/staff-admin.php'],
-body.ih-customer-ui .account-summary{display:none!important}
-@media(max-width:1050px){body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:700px){body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}body.ih-customer-ui .service-link{min-height:110px;padding:13px 8px}body.ih-customer-ui .service-link p{display:none}body.ih-customer-ui .wallet-overview{padding:20px;min-height:178px}body.ih-customer-ui .wallet-overview strong{font-size:31px}body.ih-customer-ui .primary-actions{gap:8px!important}body.ih-customer-ui .customer-help-strip{grid-template-columns:1fr}}
-@media(max-width:430px){body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(3,1fr)}body.ih-customer-ui .service-link h3{font-size:12px}body.ih-customer-ui .service-link::before{width:38px;height:38px;font-size:18px}body.ih-customer-ui .primary-actions a{font-size:11px;padding:11px 6px}}
+/* IHLink Datasub — mobile-first customer VTU workspace */
+body.ih-customer-ui{--ih-deep:#2f3020;--ih-primary:#596235;--ih-accent:#d96846;--ih-soft:#f5f5ef;--ih-line:#e7e8df;--ih-muted:#74776a}
+body.ih-customer-ui .dashboard-main{background:#f7f7f3;padding-bottom:86px}
+body.ih-customer-ui .dash-header{padding-bottom:8px}body.ih-customer-ui .dash-header .eyebrow{display:none}body.ih-customer-ui .dash-header h1{font-size:25px;margin-bottom:2px}body.ih-customer-ui .user-chip small{color:var(--ih-muted)}
+body.ih-customer-ui .sidebar-pro{background:var(--ih-deep)}body.ih-customer-ui .sidebar-pro .nav-item{font-size:13px}body.ih-customer-ui .sidebar-pro .nav-item[data-common='0']{display:none!important}
+body.ih-customer-ui .workspace-grid{grid-template-columns:1fr!important;gap:16px!important}body.ih-customer-ui .workspace-grid>.account-summary{display:none!important}
+body.ih-customer-ui .wallet-overview{position:relative;overflow:hidden;min-height:202px;border-radius:24px;padding:25px;background:linear-gradient(135deg,var(--ih-deep),var(--ih-primary));box-shadow:0 18px 40px rgba(47,48,32,.18)}
+body.ih-customer-ui .wallet-overview:after{content:'';position:absolute;width:190px;height:190px;border-radius:50%;right:-70px;top:-85px;background:rgba(255,255,255,.08)}
+body.ih-customer-ui .wallet-overview>div:first-child span{font-size:12px;opacity:.86;letter-spacing:.03em}body.ih-customer-ui .wallet-overview strong{font-size:38px;margin:8px 0;display:block;letter-spacing:-.03em}body.ih-customer-ui .wallet-overview small{font-size:12px;opacity:.82}
+body.ih-customer-ui .primary-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:22px;max-width:560px;position:relative;z-index:2}body.ih-customer-ui .primary-actions a{border-radius:12px;padding:12px 8px;background:rgba(255,255,255,.96);font-size:12px;color:var(--ih-deep);font-weight:800;border:0}
+body.ih-customer-ui .section-block{margin-top:22px}body.ih-customer-ui .section-title h2{font-size:18px;color:var(--ih-deep)}body.ih-customer-ui .section-title p{font-size:12px;color:var(--ih-muted)}
+body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}body.ih-customer-ui .service-link{min-height:126px;padding:16px 10px;border-radius:17px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:#fff;border:1px solid var(--ih-line);box-shadow:0 5px 18px rgba(47,48,32,.035);transition:.18s ease}body.ih-customer-ui .service-link:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(47,48,32,.08);border-color:#d9dacd}
+body.ih-customer-ui .service-link::before{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:#f0f1e9;color:var(--ih-primary);font-size:20px;font-weight:900;margin-bottom:4px}body.ih-customer-ui .service-link[href*='page=data']::before{content:'⇅'}body.ih-customer-ui .service-link[href*='page=airtime']::before{content:'☎'}body.ih-customer-ui .service-link[href*='page=electricity']::before{content:'⚡'}body.ih-customer-ui .service-link[href*='page=cable']::before{content:'▣'}body.ih-customer-ui .service-link[href*='page=exam']::before{content:'✓'}body.ih-customer-ui .service-link[href*='page=transactions']::before{content:'↺'}body.ih-customer-ui .service-link[href*='page=wallet']::before{content:'₦'}body.ih-customer-ui .service-link[href*='page=profile']::before{content:'●'}body.ih-customer-ui .service-link h3{font-size:13px;margin:2px 0;color:var(--ih-deep)}body.ih-customer-ui .service-link p{font-size:10px;line-height:1.4;margin:0;color:var(--ih-muted)}body.ih-customer-ui .service-link .card-link{display:none}
+body.ih-customer-ui .table-card{border-radius:17px;overflow:hidden;box-shadow:0 4px 18px rgba(47,48,32,.03);border-color:var(--ih-line)}body.ih-customer-ui .customer-hidden{display:none!important}body.ih-customer-ui .pricing-badge{background:#f0f1e9;color:var(--ih-primary)}
+body.ih-customer-ui .customer-profile-upgrade{margin-top:14px;padding:16px;border:1px solid var(--ih-line);border-radius:14px;background:#fbfbf8}body.ih-customer-ui .customer-profile-upgrade h4{margin:0 0 5px;font-size:14px}body.ih-customer-ui .customer-profile-upgrade p{margin:0 0 12px;font-size:12px;color:var(--ih-muted)}
+body.ih-customer-ui .customer-help-strip{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;background:#fff;border:1px solid var(--ih-line);border-radius:17px;padding:18px 20px;margin-top:20px}body.ih-customer-ui .customer-help-strip h3{font-size:15px;margin:0 0 4px;color:var(--ih-deep)}body.ih-customer-ui .customer-help-strip p{font-size:12px;color:var(--ih-muted);margin:0}body.ih-customer-ui .customer-help-strip .help-actions{display:flex;gap:8px;flex-wrap:wrap}
+body.ih-customer-ui .btn-primary{background:var(--ih-accent);box-shadow:0 8px 20px rgba(217,104,70,.18)}body.ih-customer-ui .btn-primary:hover{background:#c65b3d}
+body.ih-customer-ui a[href='?page=api-dashboard'],body.ih-customer-ui a[href='?page=reseller'],body.ih-customer-ui a[href='?page=admin'],body.ih-customer-ui a[href='/admin-control.php'],body.ih-customer-ui a[href='/staff-admin.php'],body.ih-customer-ui a[href='/admin-products.php'],body.ih-customer-ui .account-summary{display:none!important}
+/* App-like mobile bottom navigation: only the five everyday destinations. */
+@media(max-width:700px){body.ih-customer-ui .dashboard-main{padding-bottom:92px}body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}body.ih-customer-ui .service-link{min-height:104px;padding:12px 6px}body.ih-customer-ui .service-link p{display:none}body.ih-customer-ui .wallet-overview{padding:21px;min-height:190px;border-radius:20px}body.ih-customer-ui .wallet-overview strong{font-size:32px}body.ih-customer-ui .primary-actions{gap:7px!important}body.ih-customer-ui .customer-help-strip{grid-template-columns:1fr}.ih-mobile-vtu-nav{position:fixed;left:10px;right:10px;bottom:10px;height:66px;z-index:80;background:rgba(47,48,32,.97);border:1px solid rgba(255,255,255,.08);border-radius:20px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;padding:5px;box-shadow:0 14px 40px rgba(47,48,32,.28);backdrop-filter:blur(16px)}.ih-mobile-vtu-nav a{display:grid;place-items:center;gap:2px;color:#cfd2c4;font-size:10px;font-weight:700;padding:6px 2px;border-radius:13px}.ih-mobile-vtu-nav a b{font-size:18px;line-height:1}.ih-mobile-vtu-nav a.active{background:rgba(255,255,255,.1);color:#fff}}
+@media(min-width:701px){.ih-mobile-vtu-nav{display:none}}
+@media(max-width:430px){body.ih-customer-ui .service-grid-clean{grid-template-columns:repeat(3,1fr)}body.ih-customer-ui .service-link h3{font-size:11.5px}body.ih-customer-ui .service-link::before{width:39px;height:39px;font-size:17px}body.ih-customer-ui .primary-actions a{font-size:10.5px;padding:11px 5px}}
