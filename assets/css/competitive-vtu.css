@@ -1,0 +1,14 @@
+/* IHLink Datasub competitive UX layer */
+:root{--ih-deep:#2f3020;--ih-main:#596235;--ih-accent:#d96846;--ih-bg:#f7f7f3;--ih-card:#fff;--ih-line:#e7e8df;--ih-muted:#73776b}
+body.ih-customer-ui{background:var(--ih-bg)}
+body.ih-customer-ui .dashboard-main{max-width:1480px}
+body.ih-customer-ui .dash-header{position:sticky;top:0;z-index:25;background:rgba(247,247,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(231,232,223,.7)}
+body.ih-customer-ui .wallet-overview{border:0;background:linear-gradient(125deg,#2f3020,#596235 72%,#6d7747);box-shadow:0 20px 45px rgba(47,48,32,.2)}
+body.ih-customer-ui .service-link{position:relative;overflow:hidden}body.ih-customer-ui .service-link:active{transform:scale(.98)}
+body.ih-customer-ui .table-card tbody tr:hover{background:#fafaf6}
+body.ih-customer-ui input,body.ih-customer-ui select{min-height:48px;border-radius:12px!important}body.ih-customer-ui .btn{min-height:44px;border-radius:12px}
+.ih-app-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 0}.ih-app-tool{background:#fff;border:1px solid var(--ih-line);border-radius:14px;padding:12px;text-decoration:none;color:var(--ih-deep);font-size:12px;font-weight:800;text-align:center}.ih-app-tool b{display:block;font-size:18px;margin-bottom:4px;color:var(--ih-main)}
+.ih-security-note{display:flex;gap:10px;align-items:center;padding:12px 14px;margin:14px 0;border-radius:13px;background:#f1f2ea;color:#505540;font-size:12px}.ih-security-note b{color:var(--ih-main)}
+.ih-network-hint{font-size:11px;color:var(--ih-muted);margin-top:5px}.ih-empty-state{text-align:center;padding:35px 18px;color:var(--ih-muted)}
+.ih-toast{position:fixed;right:18px;bottom:20px;z-index:120;max-width:360px;background:var(--ih-deep);color:#fff;padding:13px 16px;border-radius:13px;box-shadow:0 16px 35px rgba(0,0,0,.2);font-size:13px;animation:ihIn .2s ease}.ih-toast.success{background:#3f5d38}.ih-toast.error{background:#873f36}@keyframes ihIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:700px){body.ih-customer-ui .dash-header{top:0}.ih-app-tools{grid-template-columns:repeat(4,1fr);gap:7px}.ih-app-tool{padding:10px 4px;font-size:10px}.ih-app-tool b{font-size:17px}body.ih-customer-ui .section-block{margin-top:17px}body.ih-customer-ui .table-card{overflow-x:auto}.ih-toast{left:12px;right:12px;bottom:88px;max-width:none}}
