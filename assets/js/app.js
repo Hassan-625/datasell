@@ -1,7 +1,7 @@
 (() => {
   const ensureStyle=(href,key)=>{if(document.querySelector(`link[data-${key}]`))return;const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.dataset[key]='1';document.head.appendChild(l);};
   ensureStyle('/assets/css/layout-fix.css?v=2','ihlinkLayoutFix');
-  ensureStyle('/assets/css/vtu-user.css?v=1','ihlinkVtuUser');
+  ensureStyle('/assets/css/vtu-user.css?v=2','ihlinkVtuUser');
 
   const qs=(s,c=document)=>c.querySelector(s), qsa=(s,c=document)=>[...c.querySelectorAll(s)];
   const sidebarNav=qs('.sidebar-nav');
@@ -17,20 +17,32 @@
     if(page==='dashboard'&&title)title.textContent='Dashboard';
     const roleTag=qs('.user-chip small');if(roleTag)roleTag.textContent='Personal Account';
 
-    const overview=qs('a[href="?page=dashboard"]',sidebarNav||document);if(overview)overview.querySelector('span')&&(overview.querySelector('span').textContent='Dashboard');
-    const profile=qs('a[href="?page=profile"]',sidebarNav||document);if(profile)profile.querySelector('span')&&(profile.querySelector('span').textContent='Profile');
+    const overview=qs('a[href="?page=dashboard"]',sidebarNav||document);if(overview?.querySelector('span'))overview.querySelector('span').textContent='Dashboard';
+    const profile=qs('a[href="?page=profile"]',sidebarNav||document);if(profile?.querySelector('span'))profile.querySelector('span').textContent='Profile';
 
-    // Standard customers should only see consumer VTU navigation.
+    // The ordinary customer sees only normal VTU services and account pages.
     const commonPages=['dashboard','data','airtime','electricity','cable','exam','wallet','transactions','profile'];
     qsa('.sidebar-nav .nav-item').forEach(a=>{const p=new URL(a.href,location.origin).searchParams.get('page');a.dataset.common=commonPages.includes(p)?'1':'0';});
 
-    // Remove internal pricing/provider environment information from the consumer workspace.
-    qsa('.dashboard-main .notice').forEach(n=>{const t=n.textContent.toLowerCase();if(t.includes('pricing')||t.includes('admin controls every tier')||t.includes('staging mode')||t.includes('provider mode'))n.classList.add('customer-hidden');});
+    // Remove business/internal implementation information from customer pages.
+    qsa('.dashboard-main .notice').forEach(n=>{const t=n.textContent.toLowerCase();if(t.includes('pricing tier')||t.includes('admin controls every tier')||t.includes('provider mode')||t.includes('safe testing mode'))n.classList.add('customer-hidden');});
     const summary=qs('.workspace-grid>.account-summary');if(summary)summary.classList.add('customer-hidden');
-    qsa('.checkout small').forEach(s=>{const t=s.textContent.toLowerCase();if(t.includes('staging')||t.includes('provider'))s.classList.add('customer-hidden');});
+    qsa('.checkout small,.summary-card small').forEach(s=>{const t=s.textContent.toLowerCase();if(t.includes('staging')||t.includes('provider fulfilment')||t.includes('api price')||t.includes('reseller price'))s.classList.add('customer-hidden');});
     qsa('.pricing-badge').forEach(b=>{b.textContent='Price';});
 
-    // Keep upgrades in Profile rather than cluttering the normal dashboard/sidebar.
+    if(page==='dashboard'){
+      const walletSmall=qs('.wallet-overview small');if(walletSmall)walletSmall.textContent='Ready for your everyday payments';
+      const servicesTitle=qs('.section-block .section-title p');if(servicesTitle)servicesTitle.textContent='Quick access to your everyday VTU services.';
+      const recentBlocks=qsa('.section-block');
+      const last=recentBlocks[recentBlocks.length-1];
+      if(last&&!qs('.customer-help-strip')){
+        const help=document.createElement('section');help.className='customer-help-strip';
+        help.innerHTML='<div><h3>Need help with a transaction?</h3><p>Check your transaction history first. Your reference number helps support resolve issues faster.</p></div><div class="help-actions"><a class="btn btn-ghost" href="?page=transactions">Transaction history</a><a class="btn btn-primary" href="?page=profile">My profile</a></div>';
+        last.insertAdjacentElement('afterend',help);
+      }
+    }
+
+    // Upgrades remain available from Profile, not in the everyday dashboard navigation.
     const roleAction=qs('input[name="action"][value="change_role"]');
     const roleForm=roleAction?.closest('form');
     if(roleForm){
