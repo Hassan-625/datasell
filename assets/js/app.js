@@ -1,89 +1,9 @@
 (() => {
-  const ensureStyle=(href,key)=>{if(document.querySelector(`link[data-${key}]`))return;const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.dataset[key]='1';document.head.appendChild(l);};
-  ensureStyle('/assets/css/layout-fix.css?v=2','ihlinkLayoutFix');
-  ensureStyle('/assets/css/vtu-user.css?v=2','ihlinkVtuUser');
-
-  const qs=(s,c=document)=>c.querySelector(s), qsa=(s,c=document)=>[...c.querySelectorAll(s)];
-  const sidebarNav=qs('.sidebar-nav');
-  const headerRole=(qs('.dash-header .eyebrow')?.textContent||'').trim().toLowerCase();
-  const userRole=(qs('.user-chip small')?.textContent||'').trim().toLowerCase();
-  const isCustomer=!!qs('.dashboard-main') && (headerRole.includes('customer')||userRole==='customer') && !qs('a[href="?page=reseller"]',sidebarNav||document) && !qs('a[href="?page=api-dashboard"]',sidebarNav||document) && !qs('a[href="?page=admin"]',sidebarNav||document);
-  const hasAdmin=!!qs('a[href="?page=admin"]',sidebarNav||document);
-
-  if(isCustomer){
-    document.body.classList.add('ih-customer-ui');
-    const page=new URLSearchParams(location.search).get('page')||'dashboard';
-    const title=qs('.dash-header h1');
-    if(page==='dashboard'&&title)title.textContent='Dashboard';
-    const roleTag=qs('.user-chip small');if(roleTag)roleTag.textContent='Personal Account';
-
-    const overview=qs('a[href="?page=dashboard"]',sidebarNav||document);if(overview?.querySelector('span'))overview.querySelector('span').textContent='Dashboard';
-    const profile=qs('a[href="?page=profile"]',sidebarNav||document);if(profile?.querySelector('span'))profile.querySelector('span').textContent='Profile';
-
-    // The ordinary customer sees only normal VTU services and account pages.
-    const commonPages=['dashboard','data','airtime','electricity','cable','exam','wallet','transactions','profile'];
-    qsa('.sidebar-nav .nav-item').forEach(a=>{const p=new URL(a.href,location.origin).searchParams.get('page');a.dataset.common=commonPages.includes(p)?'1':'0';});
-
-    // Remove business/internal implementation information from customer pages.
-    qsa('.dashboard-main .notice').forEach(n=>{const t=n.textContent.toLowerCase();if(t.includes('pricing tier')||t.includes('admin controls every tier')||t.includes('provider mode')||t.includes('safe testing mode'))n.classList.add('customer-hidden');});
-    const summary=qs('.workspace-grid>.account-summary');if(summary)summary.classList.add('customer-hidden');
-    qsa('.checkout small,.summary-card small').forEach(s=>{const t=s.textContent.toLowerCase();if(t.includes('staging')||t.includes('provider fulfilment')||t.includes('api price')||t.includes('reseller price'))s.classList.add('customer-hidden');});
-    qsa('.pricing-badge').forEach(b=>{b.textContent='Price';});
-
-    if(page==='dashboard'){
-      const walletSmall=qs('.wallet-overview small');if(walletSmall)walletSmall.textContent='Ready for your everyday payments';
-      const servicesTitle=qs('.section-block .section-title p');if(servicesTitle)servicesTitle.textContent='Quick access to your everyday VTU services.';
-      const recentBlocks=qsa('.section-block');
-      const last=recentBlocks[recentBlocks.length-1];
-      if(last&&!qs('.customer-help-strip')){
-        const help=document.createElement('section');help.className='customer-help-strip';
-        help.innerHTML='<div><h3>Need help with a transaction?</h3><p>Check your transaction history first. Your reference number helps support resolve issues faster.</p></div><div class="help-actions"><a class="btn btn-ghost" href="?page=transactions">Transaction history</a><a class="btn btn-primary" href="?page=profile">My profile</a></div>';
-        last.insertAdjacentElement('afterend',help);
-      }
-    }
-
-    // Upgrades remain available from Profile, not in the everyday dashboard navigation.
-    const roleAction=qs('input[name="action"][value="change_role"]');
-    const roleForm=roleAction?.closest('form');
-    if(roleForm){
-      const box=document.createElement('div');box.className='customer-profile-upgrade';
-      box.innerHTML='<h4>Business & reseller access</h4><p>Need reseller pricing or API access for your business? Submit an upgrade request for review.</p><a class="btn btn-ghost" href="/upgrade.php">View upgrade options</a>';
-      roleForm.replaceWith(box);
-    }
-  } else {
-    if(sidebarNav&&!qs('a[href="/upgrade.php"]',sidebarNav)){
-      const upgrade=document.createElement('a');upgrade.href='/upgrade.php';upgrade.className='nav-item';upgrade.innerHTML='<span>Upgrade Account</span>';sidebarNav.appendChild(upgrade);
-    }
-    if(sidebarNav&&hasAdmin&&!qs('a[href="/admin-control.php"]',sidebarNav)){
-      const control=document.createElement('a');control.href='/admin-control.php';control.className='nav-item';control.innerHTML='<span>Tier Management</span>';sidebarNav.appendChild(control);
-    }
-    if(sidebarNav&&hasAdmin&&!qs('a[href="/staff-admin.php"]',sidebarNav)){
-      const staff=document.createElement('a');staff.href='/staff-admin.php';staff.className='nav-item';staff.innerHTML='<span>Staff Admins</span>';sidebarNav.appendChild(staff);
-    }
-
-    const legacyRoleAction=qs('input[name="action"][value="change_role"]');
-    const legacyRoleForm=legacyRoleAction?.closest('form');
-    if(legacyRoleForm){const box=document.createElement('div');box.innerHTML='<div class="notice"><span>↗</span><div><b>Tier changes require approval</b><br><small>Request Premium, Reseller or API access from the upgrade page.</small><br><br><a class="btn btn-primary" href="/upgrade.php">Request an upgrade →</a></div></div>';legacyRoleForm.replaceWith(box);}
-  }
-
-  // Google OAuth entry point on both login and registration forms.
-  const authAction=qs('form input[name="action"][value="login"], form input[name="action"][value="register"]');
-  const authForm=authAction?.closest('form');
-  if(authForm&&!qs('[data-google-auth]')){
-    const googleWrap=document.createElement('div');googleWrap.dataset.googleAuth='1';googleWrap.style.marginTop='16px';
-    googleWrap.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:#7a8797;font-size:12px"><span style="height:1px;background:#e2e8f0;flex:1"></span><span>OR</span><span style="height:1px;background:#e2e8f0;flex:1"></span></div><a href="/google-auth.php?action=start" class="btn btn-ghost" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #d9e1ea;background:#fff"><span style="font-weight:900;font-size:18px">G</span><span>Continue with Google</span></a>`;
-    authForm.appendChild(googleWrap);
-  }
-
-  const sidebar=qs('#sidebar'),overlay=qs('[data-sidebar-overlay]');
-  qs('[data-sidebar-open]')?.addEventListener('click',()=>{sidebar?.classList.add('open');overlay?.classList.add('show')});
-  const closeSidebar=()=>{sidebar?.classList.remove('open');overlay?.classList.remove('show')};
-  qs('[data-sidebar-close]')?.addEventListener('click',closeSidebar);overlay?.addEventListener('click',closeSidebar);
-  qs('[data-toggle-password]')?.addEventListener('click',e=>{const input=qs('#password');if(!input)return;const show=input.type==='password';input.type=show?'text':'password';e.currentTarget.textContent=show?'Hide':'Show'});
-  qs('[data-balance-toggle]')?.addEventListener('click',()=>{const el=qs('[data-balance]');if(!el)return;if(!el.dataset.real)el.dataset.real=el.textContent;const hidden=el.textContent.includes('•');el.textContent=hidden?el.dataset.real:'₦••••••';});
-  qsa('[data-amount]').forEach(btn=>btn.addEventListener('click',()=>{const input=qs('input[name="amount"]');if(input){input.value=btn.dataset.amount;input.focus();}}));
-  const search=qs('[data-table-search]'),filter=qs('[data-status-filter]'),table=qs('[data-transaction-table]');
-  const filterRows=()=>{if(!table)return;const term=(search?.value||'').toLowerCase();const status=(filter?.value||'').toLowerCase();qsa('tbody tr',table).forEach(row=>{const text=row.innerText.toLowerCase();const s=(row.dataset.status||'').toLowerCase();row.style.display=(!term||text.includes(term))&&(!status||s===status)?'':'none';});};
-  search?.addEventListener('input',filterRows);filter?.addEventListener('change',filterRows);
-  qsa('[data-confirm-form]').forEach(form=>form.addEventListener('submit',e=>{const amount=form.querySelector('input[name="amount"]')?.value||'0';const provider=form.querySelector('[name="provider"]')?.value||'service';if(!confirm(`Confirm ${provider} purchase of ₦${Number(amount).toLocaleString()}?`))e.preventDefault();}));
+  const ensureStyle=(href,key)=>{if(document.querySelector(`link[data-${key}]`))return;const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.dataset[key]='1';document.head.appendChild(l);};ensureStyle('/assets/css/layout-fix.css?v=2','ihlinkLayoutFix');ensureStyle('/assets/css/vtu-user.css?v=2','ihlinkVtuUser');
+  const qs=(s,c=document)=>c.querySelector(s),qsa=(s,c=document)=>[...c.querySelectorAll(s)];const sidebarNav=qs('.sidebar-nav');const headerRole=(qs('.dash-header .eyebrow')?.textContent||'').trim().toLowerCase();const userRole=(qs('.user-chip small')?.textContent||'').trim().toLowerCase();const isCustomer=!!qs('.dashboard-main')&&(headerRole.includes('customer')||userRole==='customer')&&!qs('a[href="?page=reseller"]',sidebarNav||document)&&!qs('a[href="?page=api-dashboard"]',sidebarNav||document)&&!qs('a[href="?page=admin"]',sidebarNav||document);const hasAdmin=!!qs('a[href="?page=admin"]',sidebarNav||document);
+  if(isCustomer){document.body.classList.add('ih-customer-ui');const page=new URLSearchParams(location.search).get('page')||'dashboard';const title=qs('.dash-header h1');if(page==='dashboard'&&title)title.textContent='Dashboard';const roleTag=qs('.user-chip small');if(roleTag)roleTag.textContent='Personal Account';const overview=qs('a[href="?page=dashboard"]',sidebarNav||document);if(overview?.querySelector('span'))overview.querySelector('span').textContent='Dashboard';const profile=qs('a[href="?page=profile"]',sidebarNav||document);if(profile?.querySelector('span'))profile.querySelector('span').textContent='Profile';const commonPages=['dashboard','data','airtime','electricity','cable','exam','wallet','transactions','profile'];qsa('.sidebar-nav .nav-item').forEach(a=>{const p=new URL(a.href,location.origin).searchParams.get('page');a.dataset.common=commonPages.includes(p)?'1':'0';});qsa('.dashboard-main .notice').forEach(n=>{const t=n.textContent.toLowerCase();if(t.includes('pricing tier')||t.includes('admin controls every tier')||t.includes('provider mode')||t.includes('safe testing mode'))n.classList.add('customer-hidden');});const summary=qs('.workspace-grid>.account-summary');if(summary)summary.classList.add('customer-hidden');qsa('.checkout small,.summary-card small').forEach(s=>{const t=s.textContent.toLowerCase();if(t.includes('staging')||t.includes('provider fulfilment')||t.includes('api price')||t.includes('reseller price'))s.classList.add('customer-hidden');});qsa('.pricing-badge').forEach(b=>b.textContent='Price');if(page==='dashboard'){const walletSmall=qs('.wallet-overview small');if(walletSmall)walletSmall.textContent='Ready for your everyday payments';const servicesTitle=qs('.section-block .section-title p');if(servicesTitle)servicesTitle.textContent='Quick access to your everyday VTU services.';const blocks=qsa('.section-block'),last=blocks[blocks.length-1];if(last&&!qs('.customer-help-strip')){const help=document.createElement('section');help.className='customer-help-strip';help.innerHTML='<div><h3>Need help with a transaction?</h3><p>Check your transaction history first. Your reference number helps support resolve issues faster.</p></div><div class="help-actions"><a class="btn btn-ghost" href="?page=transactions">Transaction history</a><a class="btn btn-primary" href="?page=profile">My profile</a></div>';last.insertAdjacentElement('afterend',help);}}const roleForm=qs('input[name="action"][value="change_role"]')?.closest('form');if(roleForm){const box=document.createElement('div');box.className='customer-profile-upgrade';box.innerHTML='<h4>Business & reseller access</h4><p>Need reseller pricing or API access for your business? Submit an upgrade request for review.</p><a class="btn btn-ghost" href="/upgrade.php">View upgrade options</a>';roleForm.replaceWith(box);}}
+  else{if(sidebarNav&&!qs('a[href="/upgrade.php"]',sidebarNav)){const a=document.createElement('a');a.href='/upgrade.php';a.className='nav-item';a.innerHTML='<span>Upgrade Account</span>';sidebarNav.appendChild(a);}if(sidebarNav&&hasAdmin&&!qs('a[href="/admin-products.php"]',sidebarNav)){const a=document.createElement('a');a.href='/admin-products.php';a.className='nav-item';a.innerHTML='<span>Products & Pricing</span>';sidebarNav.appendChild(a);}if(sidebarNav&&hasAdmin&&!qs('a[href="/admin-control.php"]',sidebarNav)){const a=document.createElement('a');a.href='/admin-control.php';a.className='nav-item';a.innerHTML='<span>Tier Management</span>';sidebarNav.appendChild(a);}if(sidebarNav&&hasAdmin&&!qs('a[href="/staff-admin.php"]',sidebarNav)){const a=document.createElement('a');a.href='/staff-admin.php';a.className='nav-item';a.innerHTML='<span>Staff Admins</span>';sidebarNav.appendChild(a);}const legacy=qs('input[name="action"][value="change_role"]')?.closest('form');if(legacy){const box=document.createElement('div');box.innerHTML='<div class="notice"><span>↗</span><div><b>Tier changes require approval</b><br><small>Request Premium, Reseller or API access from the upgrade page.</small><br><br><a class="btn btn-primary" href="/upgrade.php">Request an upgrade →</a></div></div>';legacy.replaceWith(box);}}
+  if(hasAdmin&&new URLSearchParams(location.search).get('page')==='admin'){const pricing=[...qsa('.section-block')].find(s=>s.querySelector('h2')?.textContent.trim()==='Multi-tier pricing');if(pricing&&!qs('[data-pricing-manager]',pricing)){const title=pricing.querySelector('.section-title');if(title){const a=document.createElement('a');a.href='/admin-products.php';a.className='btn btn-primary';a.dataset.pricingManager='1';a.textContent='Manage / Edit Products';title.appendChild(a);}}}
+  const authForm=qs('form input[name="action"][value="login"],form input[name="action"][value="register"]')?.closest('form');if(authForm&&!qs('[data-google-auth]')){const w=document.createElement('div');w.dataset.googleAuth='1';w.style.marginTop='16px';w.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin:14px 0;color:#7a8797;font-size:12px"><span style="height:1px;background:#e2e8f0;flex:1"></span><span>OR</span><span style="height:1px;background:#e2e8f0;flex:1"></span></div><a href="/google-auth.php?action=start" class="btn btn-ghost" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #d9e1ea;background:#fff"><span style="font-weight:900;font-size:18px">G</span><span>Continue with Google</span></a>';authForm.appendChild(w);}
+  const sidebar=qs('#sidebar'),overlay=qs('[data-sidebar-overlay]');qs('[data-sidebar-open]')?.addEventListener('click',()=>{sidebar?.classList.add('open');overlay?.classList.add('show')});const close=()=>{sidebar?.classList.remove('open');overlay?.classList.remove('show')};qs('[data-sidebar-close]')?.addEventListener('click',close);overlay?.addEventListener('click',close);qs('[data-toggle-password]')?.addEventListener('click',e=>{const i=qs('#password');if(!i)return;const show=i.type==='password';i.type=show?'text':'password';e.currentTarget.textContent=show?'Hide':'Show'});qs('[data-balance-toggle]')?.addEventListener('click',()=>{const el=qs('[data-balance]');if(!el)return;if(!el.dataset.real)el.dataset.real=el.textContent;el.textContent=el.textContent.includes('•')?el.dataset.real:'₦••••••';});qsa('[data-amount]').forEach(b=>b.addEventListener('click',()=>{const i=qs('input[name="amount"]');if(i){i.value=b.dataset.amount;i.focus();}}));const search=qs('[data-table-search]'),filter=qs('[data-status-filter]'),table=qs('[data-transaction-table]');const filterRows=()=>{if(!table)return;const term=(search?.value||'').toLowerCase(),status=(filter?.value||'').toLowerCase();qsa('tbody tr',table).forEach(r=>{const text=r.innerText.toLowerCase(),s=(r.dataset.status||'').toLowerCase();r.style.display=(!term||text.includes(term))&&(!status||s===status)?'':'none';});};search?.addEventListener('input',filterRows);filter?.addEventListener('change',filterRows);
 })();
